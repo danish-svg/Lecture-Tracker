@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSE-A | Lecture Dashboard</title>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-700: #334155;
+            --slate-200: #e2e8f0;
+            --indigo-600: #4f46e5;
+            --emerald-500: #10b981;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--slate-900);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .badge-live {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--emerald-500);
+            background: #ecfdf5;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--emerald-500);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            70% { transform: scale(1.2); opacity: 0; }
+            100% { transform: scale(0.95); opacity: 0; }
+        }
+
+        /* Main Card */
+        .main-card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .current-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--slate-700);
+            margin-bottom: 8px;
+        }
+
+        .subject-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            line-height: 1.2;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--slate-200);
+        }
+
+        .meta-item span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--slate-700);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .meta-item p {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--indigo-600);
+        }
+
+        /* Upcoming Section */
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--slate-700);
+            margin-bottom: 16px;
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .list-item:hover { border-color: var(--indigo-600); }
+
+        .list-info h4 { font-size: 0.95rem; font-weight: 600; }
+        .list-info p { font-size: 0.8rem; color: var(--slate-700); }
+        .list-time { font-family: monospace; font-weight: 700; color: var(--indigo-600); }
+
+        @media (max-width: 480px) {
+            body { padding: 20px 15px; }
+            .subject-name { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="header">
+        <h1>NIET | CSE-A</h1>
+        <div class="badge-live">
+            <div class="dot"></div>
+            Live Tracker
+        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="current-label">Currently In Session</div>
+        <div id="current-class" class="subject-name">No Active Lecture</div>
+        
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span>Location</span>
+                <p id="room">--</p>
+            </div>
+            <div class="meta-item" style="text-align: right;">
+                <span>Time Remaining</span>
+                <p id="timer" style="color: var(--emerald-500);">00:00</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">Schedule Timeline</div>
+    <div id="upcoming-list" class="list-container">
+        </div>
+</div>
+
+<script>
+const schedule = {
+    "Monday": [
+        { name: "Differential Equations (NFS)", start: "09:40", end: "10:30", room: "A-104" },
+        { name: "Data Structure & Algorithm (RKK)", start: "10:30", end: "11:20", room: "A-104" },
+        { name: "Digital Electronics & IOT (AKD)", start: "11:20", end: "12:10", room: "A-104" },
+        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "Mess" },
+        { name: "Lab: CCSE0251", start: "13:00", end: "14:40", room: "A-010" },
+        { name: "Differential Equations (NFS)", start: "14:40", end: "15:30", room: "A-104" }
+    ],
+    "Wednesday": [
+        { name: "Digital Electronics & IOT (AKD)", start: "09:40", end: "10:30", room: "A-104" },
+        { name: "Differential Equations (NFS)", start: "10:30", end: "11:20", room: "A-104" },
+        { name: "Intelligent Interaction (SSD)", start: "11:20", end: "12:10", room: "A-104" },
+        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
+        { name: "Lab: CASL0251", start: "13:00", end: "14:40", room: "G-104" },
+        { name: "Innovation & Entrepreneurship", start: "14:40", end: "15:30", room: "A-104" },
+        { name: "Data Structure (RKK)", start: "15:30", end: "16:20", room: "A-104" }
+    ],
+    // Saturday for testing since today is Saturday
+    "Saturday": [
+        { name: "Data Structure (RKK)", start: "09:40", end: "10:30", room: "A-104" },
+        { name: "AKD/AKK", start: "10:30", end: "11:20", room: "A-104" },
+        { name: "Digital Electronics (A-217)", start: "11:20", end: "12:10", room: "A-217" },
+        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
+        { name: "Constitution of India", start: "13:00", end: "13:50", room: "A-104" },
+        { name: "Differential Equations (NFS)", start: "13:50", end: "14:40", room: "A-104" },
+        { name: "Intelligent Interaction (SSD)", start: "14:40", end: "15:30", room: "A-104" }
+    ]
+};
+
+function refreshTracker() {
+    const now = new Date();
+    const day = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
+    const today = schedule[day] || [];
+    const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+    let current = today.find(s => time >= s.start && time < s.end);
+    let nextOnes = today.filter(s => s.start > time);
+
+    // Update Main Card
+    document.getElementById('current-class').innerText = current ? current.name : "Class Dismissed";
+    document.getElementById('room').innerText = current ? current.room : "--";
+    
+    if (current) {
+        const [h, m] = current.end.split(':');
+        const end = new Date(); end.setHours(h, m, 0);
+        const diff = Math.floor((end - now) / 1000);
+        const mm = Math.floor(diff / 60);
+        const ss = diff % 60;
+        document.getElementById('timer').innerText = `${mm}:${ss.toString().padStart(2, '0')}`;
+    } else {
+        document.getElementById('timer').innerText = "--:--";
+    }
+
+    // Update List
+    document.getElementById('upcoming-list').innerHTML = nextOnes.map(s => `
+        <div class="list-item">
+            <div class="list-info">
+                <h4>${s.name}</h4>
+                <p>Room ${s.room}</p>
+            </div>
+            <div class="list-time">${s.start}</div>
+        </div>
+    `).join('') || `<div style="text-align:center; padding: 20px; opacity:0.5;">No more lectures today</div>`;
+}
+
+setInterval(refreshTracker, 1000);
+refreshTracker();
+</script>
+</body>
+</html>
