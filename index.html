@@ -196,30 +196,58 @@
 const schedule = {
     "Monday": [
         { name: "Differential Equations (NFS)", start: "09:40", end: "10:30", room: "A-104" },
-        { name: "Data Structure & Algorithm (RKK)", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Digital Electronics & IOT (AKD)", start: "11:20", end: "12:10", room: "A-104" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "Mess" },
-        { name: "Lab: CCSE0251", start: "13:00", end: "14:40", room: "A-010" },
-        { name: "Differential Equations (NFS)", start: "14:40", end: "15:30", room: "A-104" }
+        { name: "DSA (RKK)", start: "10:30", end: "11:20", room: "A-104" },
+        { name: "Digital Electronics (AKD)", start: "11:20", end: "12:10", room: "A-104" },
+        { name: "LUNCH BREAK", start: "12:10", end: "01:00", room: "-" },
+        { name: "DSA Lab (RKK/STY)", start: "01:00", end: "02:40", room: "A-010" },
+        { name: "Differential Equations (NFS)", start: "02:40", end: "03:30", room: "A-104" },
+        { name: "Foreign Language", start: "03:30", end: "04:20", room: "-" }
+    ],
+    "Tuesday": [
+        { name: "Differential Equations (NFS)", start: "09:40", end: "10:30", room: "A-104" },
+        { name: "DSA (RKK)", start: "10:30", end: "11:20", room: "A-104" },
+        { name: "Digital Electronics (AKD)", start: "11:20", end: "12:10", room: "A-104" },
+        { name: "LUNCH BREAK", start: "12:10", end: "01:00", room: "-" },
+        { name: "ABC Lab (GRJ/HNK)", start: "01:00", end: "02:40", room: "G1(211)/G2(104)" },
+        { name: "Innovation & Ent. (TNS)", start: "02:40", end: "03:30", room: "A-104" },
+        { name: "Intelligent Systems (SSD)", start: "03:30", end: "04:20", room: "A-104" }
     ],
     "Wednesday": [
-        { name: "Digital Electronics & IOT (AKD)", start: "09:40", end: "10:30", room: "A-104" },
+        { name: "Digital Electronics (AKD)", start: "09:40", end: "10:30", room: "A-104" },
         { name: "Differential Equations (NFS)", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Intelligent Interaction (SSD)", start: "11:20", end: "12:10", room: "A-104" },
+        { name: "Intelligent Systems (SSD)", start: "11:20", end: "12:10", room: "A-104" },
         { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "Lab: CASL0251", start: "13:00", end: "14:40", room: "G-104" },
-        { name: "Innovation & Entrepreneurship", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "Data Structure (RKK)", start: "15:30", end: "16:20", room: "A-104" }
+        { name: "ABC Lab (GRJ/HNK)", start: "01:00", end: "02:40", room: "G1(211)/G2(104)" },
+        { name: "Innovation & Ent. (TNS)", start: "02:40", end: "03:30", room: "A-104" },
+        { name: "DSA (RKK)", start: "03:30", end: "04:20", room: "A-104" }
     ],
-    // Saturday for testing since today is Saturday
+    "Thursday": [
+        { name: "DSA Lab (RKK/SSD)", start: "09:40", end: "11:20", room: "A-010" },
+        { name: "Differential Equations (NFS)", start: "11:20", end: "12:10", room: "A-104" },
+        { name: "LUNCH BREAK", start: "12:10", end: "01:00", room: "-" },
+        { name: "Intelligent Systems (SSD)", start: "01:00", end: "01:50", room: "A-104" },
+        { name: "Differential Equations (NFS)", start: "01:50", end: "02:40", room: "A-104" },
+        { name: "Innovation & Ent. (TNS)", start: "02:40", end: "03:30", room: "A-104" },
+        { name: "Digital Electronics (AKD)", start: "03:30", end: "04:20", room: "A-104" }
+    ],
+    "Friday": [
+        { name: "Digital Electronics (AKD)", start: "09:40", end: "10:30", room: "A-104" },
+        { name: "Differential Equations (NFS)", start: "10:30", end: "11:20", room: "A-104" },
+        { name: "Foreign Language", start: "11:20", end: "12:10", room: "-" },
+        { name: "LUNCH BREAK", start: "12:10", end: "01:00", room: "-" },
+        { name: "Constitution Of India (SHM)", start: "01:00", end: "01:50", room: "A-104" },
+        { name: "Digital Electronics (AKD)", start: "01:50", end: "02:40", room: "A-104" },
+        { name: "Innovation & Ent. (TNS)", start: "02:40", end: "03:30", room: "A-104" },
+        { name: "DSA (RKK)", start: "03:30", end: "04:20", room: "A-104" }
+    ],
     "Saturday": [
         { name: "Data Structure (RKK)", start: "09:40", end: "10:30", room: "A-104" },
         { name: "AKD/AKK", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Digital Electronics (A-217)", start: "11:20", end: "12:10", room: "A-217" },
+        { name: "Digital Electronics (CEC0201)", start: "11:20", end: "12:10", room: "A-217" },
         { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "Constitution of India", start: "13:00", end: "13:50", room: "A-104" },
+        { name: "Constitution Law (SHM)", start: "13:00", end: "13:50", room: "A-104" },
         { name: "Differential Equations (NFS)", start: "13:50", end: "14:40", room: "A-104" },
-        { name: "Intelligent Interaction (SSD)", start: "14:40", end: "15:30", room: "A-104" }
+        { name: "Intelligent Systems (SSD)", start: "14:40", end: "15:30", room: "A-104" }
     ]
 };
 
