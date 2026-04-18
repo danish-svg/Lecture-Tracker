@@ -1,294 +1,695 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSE-A | Lecture Dashboard</title>
-    <style>
-        :root {
-            --slate-900: #0f172a;
-            --slate-700: #334155;
-            --slate-200: #e2e8f0;
-            --indigo-600: #4f46e5;
-            --emerald-500: #10b981;
-            --white: #ffffff;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NIET CSE-A — Master Timetable</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ── Theme variables ── */
+  [data-theme="light"] {
+    --bg:           #fff5f7;
+    --bg2:          #ffeef2;
+    --card:         #ffffff;
+    --card-border:  #fcd5df;
+    --accent:       #e0547a;
+    --accent2:      #c73c62;
+    --accent-soft:  #fce4ec;
+    --accent-glow:  rgba(224,84,122,0.13);
+    --pink-mid:     #f48fb1;
+    --pink-pale:    #fff0f4;
+    --green:        #2e7d58;
+    --green-bg:     #e6f4ee;
+    --amber:        #b45309;
+    --amber-bg:     #fef3c7;
+    --muted:        #9e7080;
+    --muted2:       #b08090;
+    --text:         #2d1a22;
+    --text2:        #5c3347;
+    --dot-color:    rgba(224,84,122,0.08);
+    --strip-upcoming: #fcd5df;
+    --strip-past:   #e5e5e5;
+    --time-bg:      #fff0f4;
+    --time-bg-live: #fce4ec;
+    --toggle-bg:    #fce4ec;
+    --toggle-knob:  #e0547a;
+    --pill-done-bg: #f3f3f3;
+    --pill-done-c:  #aaa;
+    --pill-done-b:  #e5e5e5;
+    --lab-bg:       #fff0f4;
+    --lab-c:        #c73c62;
+    --lab-b:        #fcd5df;
+  }
+  [data-theme="dark"] {
+    --bg:           #0f0a0d;
+    --bg2:          #1a0d14;
+    --card:         #1e1118;
+    --card-border:  #3d1f2c;
+    --accent:       #f06292;
+    --accent2:      #e91e63;
+    --accent-soft:  rgba(240,98,146,0.15);
+    --accent-glow:  rgba(240,98,146,0.18);
+    --pink-mid:     #f48fb1;
+    --pink-pale:    #1a0d14;
+    --green:        #4caf8a;
+    --green-bg:     rgba(76,175,138,0.12);
+    --amber:        #fbbf24;
+    --amber-bg:     rgba(251,191,36,0.12);
+    --muted:        #a07080;
+    --muted2:       #8a5a68;
+    --text:         #f5e6ea;
+    --text2:        #e8b4c4;
+    --dot-color:    rgba(240,98,146,0.06);
+    --strip-upcoming: #3d1f2c;
+    --strip-past:   #2a2a2a;
+    --time-bg:      #1e1118;
+    --time-bg-live: rgba(240,98,146,0.12);
+    --toggle-bg:    #3d1f2c;
+    --toggle-knob:  #f06292;
+    --pill-done-bg: #2a2a2a;
+    --pill-done-c:  #666;
+    --pill-done-b:  #333;
+    --lab-bg:       rgba(240,98,146,0.12);
+    --lab-c:        #f48fb1;
+    --lab-b:        #3d1f2c;
+  }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            background-color: #f8fafc;
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            color: var(--slate-900);
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-        }
+  body {
+    font-family: var(--sans, 'DM Sans', sans-serif);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
 
-        .dashboard {
-            width: 100%;
-            max-width: 600px;
-        }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: -160px; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 340px;
+    background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-        /* Header Styles */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
 
-        .header h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-        }
+  /* ── Dark mode toggle ── */
+  .topbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+  }
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle-label { font-size: 12px; color: var(--muted); }
+  .toggle-track {
+    width: 40px; height: 22px;
+    background: var(--toggle-bg);
+    border-radius: 11px;
+    position: relative;
+    border: 1.5px solid var(--card-border);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .toggle-knob {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--toggle-knob);
+    transition: transform 0.25s, background 0.3s;
+  }
+  [data-theme="dark"] .toggle-knob { transform: translateX(18px); }
+  .toggle-icon { font-size: 14px; }
 
-        .badge-live {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--emerald-500);
-            background: #ecfdf5;
-            padding: 4px 10px;
-            border-radius: 12px;
-            text-transform: uppercase;
-        }
+  /* ── Header ── */
+  .college-header { text-align: center; padding: 1.5rem 1rem 2rem; }
+  .college-name {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 22px;
+    color: var(--accent2);
+    line-height: 1.3;
+    margin-bottom: 4px;
+    transition: color 0.3s;
+  }
+  .college-sub {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 15px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .college-meta {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .header-rule {
+    width: 60px; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--pink-mid));
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
 
-        .dot {
-            height: 8px;
-            width: 8px;
-            background-color: var(--emerald-500);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
+  /* ── Clock bar ── */
+  .clock-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--accent-soft);
+    border: 1.5px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.1rem 1.5rem;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    box-shadow: 0 2px 16px var(--accent-glow);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .clock-left { display: flex; align-items: baseline; gap: 7px; }
+  .clock-time {
+    font-size: 34px; font-weight: 600;
+    color: var(--accent2);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    transition: color 0.3s;
+  }
+  .clock-ampm { font-size: 14px; color: var(--muted); }
+  .clock-right { text-align: right; }
+  .clock-status-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+  }
+  .clock-status-text { font-size: 13px; font-weight: 500; color: var(--accent2); max-width: 260px; }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            70% { transform: scale(1.2); opacity: 0; }
-            100% { transform: scale(0.95); opacity: 0; }
-        }
+  /* ── Section head ── */
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+  .section-badge {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .badge-today { background: var(--accent-soft); color: var(--accent2); border: 1px solid var(--card-border); }
+  .badge-next  { background: var(--green-bg); color: var(--green); border: 1px solid rgba(76,175,138,0.3); }
+  .section-day { font-family: 'DM Serif Display', Georgia, serif; font-size: 26px; color: var(--text2); }
+  .section-date { margin-left: auto; font-size: 12px; color: var(--muted); }
 
-        /* Main Card */
-        .main-card {
-            background: var(--white);
-            border: 1px solid var(--slate-200);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 24px;
-        }
+  .section-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 2.5rem 0 1.5rem;
+    color: var(--muted); font-size: 11px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .section-divider::before, .section-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--card-border);
+  }
 
-        .current-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--slate-700);
-            margin-bottom: 8px;
-        }
+  /* ── Cards ── */
+  .lecture-list { display: flex; flex-direction: column; gap: 10px; }
 
-        .subject-name {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--slate-900);
-            line-height: 1.2;
-        }
+  .lec-card {
+    display: flex; align-items: stretch;
+    background: var(--card);
+    border: 1.5px solid var(--card-border);
+    border-radius: 16px; overflow: hidden;
+    transition: border-color 0.22s, transform 0.2s, box-shadow 0.2s, background 0.3s;
+    position: relative;
+  }
+  .lec-card:hover {
+    border-color: var(--pink-mid);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px var(--accent-glow);
+  }
+  .lec-card.state-past { opacity: 0.38; }
+  .lec-card.state-current {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 20px var(--accent-glow);
+  }
+  .lec-card.is-lunch { border-style: dashed; background: var(--pink-pale); }
+  .lec-card.is-lab { border-color: var(--lab-b); }
 
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--slate-200);
-        }
+  .lec-card::before {
+    content: ''; width: 4px; background: transparent; flex-shrink: 0;
+  }
+  .lec-card.state-current::before  { background: linear-gradient(180deg, var(--accent), var(--pink-mid)); }
+  .lec-card.state-upcoming::before { background: var(--strip-upcoming); }
+  .lec-card.state-past::before     { background: var(--strip-past); }
+  .lec-card.is-lunch::before       { background: transparent; }
 
-        .meta-item span {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--slate-700);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
+  .time-col {
+    min-width: 86px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 14px 10px;
+    border-right: 1.5px solid var(--card-border);
+    gap: 2px;
+    background: var(--time-bg);
+    transition: background 0.3s;
+  }
+  .lec-card.state-current .time-col { background: var(--time-bg-live); }
+  .t-start { font-size: 13px; font-weight: 600; color: var(--accent2); font-variant-numeric: tabular-nums; }
+  .t-sep   { font-size: 10px; color: var(--pink-mid); }
+  .t-end   { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
-        .meta-item p {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--indigo-600);
-        }
+  .info-col {
+    flex: 1; padding: 12px 16px;
+    display: flex; flex-direction: column;
+    justify-content: center; gap: 3px;
+  }
+  .subj   { font-size: 15px; font-weight: 500; color: var(--text); }
+  .teacher-name { font-size: 12px; color: var(--muted2); }
+  .code-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 6px;
+    background: var(--lab-bg); color: var(--lab-c);
+    border: 1px solid var(--lab-b);
+    margin-top: 3px; align-self: flex-start;
+    letter-spacing: 0.04em;
+  }
+  .dur { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .room-tag {
+    font-size: 10px; color: var(--muted);
+    font-weight: 500; margin-top: 1px;
+  }
 
-        /* Upcoming Section */
-        .section-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--slate-700);
-            margin-bottom: 16px;
-        }
+  .progress-track {
+    height: 3px; background: var(--card-border);
+    border-radius: 2px; margin-top: 8px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--pink-mid));
+    border-radius: 2px;
+  }
 
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+  .status-col {
+    min-width: 100px;
+    display: flex; flex-direction: column;
+    align-items: flex-end; justify-content: center;
+    padding: 14px 14px; gap: 4px;
+  }
+  .pill {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+    letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .pill-live  { background: var(--accent-soft); color: var(--accent2); border: 1px solid var(--card-border); }
+  .pill-done  { background: var(--pill-done-bg); color: var(--pill-done-c); border: 1px solid var(--pill-done-b); }
+  .pill-soon  { background: var(--green-bg); color: var(--green); border: 1px solid rgba(76,175,138,0.3); }
+  .pill-lunch { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+  .pill-lab   { background: var(--lab-bg); color: var(--lab-c); border: 1px solid var(--lab-b); }
+  .countdown  { font-size: 11px; color: var(--muted2); text-align: right; }
 
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: var(--white);
-            border: 1px solid var(--slate-200);
-            border-radius: 12px;
-            transition: all 0.2s;
-        }
+  .live-dot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--accent);
+    margin-right: 5px; animation: pulse 1.4s infinite; vertical-align: middle;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.3; transform:scale(0.7); }
+  }
 
-        .list-item:hover { border-color: var(--indigo-600); }
+  .no-classes {
+    text-align: center; padding: 2.5rem 1rem;
+    color: var(--muted); font-size: 14px;
+    background: var(--pink-pale);
+    border: 1.5px dashed var(--card-border);
+    border-radius: 16px;
+  }
 
-        .list-info h4 { font-size: 0.95rem; font-weight: 600; }
-        .list-info p { font-size: 0.8rem; color: var(--slate-700); }
-        .list-time { font-family: monospace; font-weight: 700; color: var(--indigo-600); }
+  .footer {
+    text-align: center; margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--card-border);
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.05em;
+  }
 
-        @media (max-width: 480px) {
-            body { padding: 20px 15px; }
-            .subject-name { font-size: 1.5rem; }
-        }
-    </style>
+  .lec-card { animation: fadeUp 0.32s ease both; }
+  .lec-card.state-past { animation: none; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  @media (max-width: 520px) {
+    .clock-time { font-size: 26px; }
+    .clock-status-text { font-size: 12px; max-width: 160px; }
+    .section-day { font-size: 20px; }
+    .time-col { min-width: 70px; }
+    .status-col { min-width: 80px; }
+    .subj { font-size: 14px; }
+  }
+</style>
 </head>
 <body>
+<div class="wrapper">
 
-<div class="dashboard">
-    <div class="header">
-        <h1>NIET | CSE-A</h1>
-        <div class="badge-live">
-            <div class="dot"></div>
-            Live Tracker
-        </div>
+  <!-- Top bar with toggle -->
+  <div class="topbar">
+    <div class="toggle-wrap" id="theme-toggle">
+      <span class="toggle-icon" id="toggle-icon">🌙</span>
+      <div class="toggle-track"><div class="toggle-knob"></div></div>
+      <span class="toggle-label" id="toggle-label">Dark mode</span>
     </div>
+  </div>
 
-    <div class="main-card">
-        <div class="current-label">Currently In Session</div>
-        <div id="current-class" class="subject-name">No Active Lecture</div>
-        
-        <div class="meta-grid">
-            <div class="meta-item">
-                <span>Location</span>
-                <p id="room">--</p>
-            </div>
-            <div class="meta-item" style="text-align: right;">
-                <span>Time Remaining</span>
-                <p id="timer" style="color: var(--emerald-500);">00:00</p>
-            </div>
-        </div>
-    </div>
+  <!-- Header -->
+  <div class="college-header">
+    <div class="college-name">Noida Institute of Engineering &amp; Technology</div>
+    <div class="college-sub">Master Time-Table</div>
+    <div class="college-meta">Section: CSE-A &nbsp;·&nbsp; Room: A-104 &nbsp;·&nbsp; w.e.f. 27/01/2026</div>
+    <div class="header-rule"></div>
+  </div>
 
-    <div class="section-title">Schedule Timeline</div>
-    <div id="upcoming-list" class="list-container">
-        </div>
-        <br><br><br><br><br>
-    <div class="section-title">
-        Made by : Afjal<br>
-        Original Idea's Credit : Swayam (CSE-F)
+  <!-- Clock bar -->
+  <div class="clock-bar">
+    <div class="clock-left">
+      <div class="clock-time" id="clock-time">--:--:--</div>
+      <div class="clock-ampm" id="clock-ampm"></div>
     </div>
+    <div class="clock-right">
+      <div class="clock-status-label">Right now</div>
+      <div class="clock-status-text" id="clock-status">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Today -->
+  <div id="today-head"></div>
+  <div class="lecture-list" id="today-list"></div>
+
+  <!-- Divider -->
+  <div class="section-divider" id="divider-label">Next class day</div>
+
+  <!-- Next day -->
+  <div id="next-head"></div>
+  <div class="lecture-list" id="next-list"></div>
+
+  <div class="footer">
+    NIET · CSE-A · Section Timetable · Updated live
+  </div>
 </div>
 
 <script>
-const schedule = {
-    "Monday": [
-        { name: "Differential Equations (NFS)", start: "09:40", end: "10:30", room: "A-104" },
-        { name: "DSA (RKK)", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Digital Electronics (AKD)", start: "11:20", end: "12:10", room: "A-104" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "DSA Lab (RKK/STY)", start: "13:00", end: "14:40", room: "A-010" },
-        { name: "Differential Equations (NFS)", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "Foreign Language", start: "15:30", end: "16:20", room: "-" }
-    ],
-    "Tuesday": [
-        { name: "Differential Equations (NFS)", start: "09:40", end: "10:30", room: "A-104" },
-        { name: "DSA (RKK)", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Digital Electronics (AKD)", start: "11:20", end: "12:10", room: "A-104" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "ABC Lab (GRJ/HNK)", start: "13:00", end: "14:40", room: "G1(211)/G2(104)" },
-        { name: "Innovation & Ent. (TNS)", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "Intelligent Systems (SSD)", start: "15:30", end: "16:20", room: "A-104" }
-    ],
-    "Wednesday": [
-        { name: "Digital Electronics (AKD)", start: "09:40", end: "10:30", room: "A-104" },
-        { name: "Differential Equations (NFS)", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Intelligent Systems (SSD)", start: "11:20", end: "12:10", room: "A-104" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "ABC Lab (GRJ/HNK)", start: "13:00", end: "14:40", room: "G1(211)/G2(104)" },
-        { name: "Innovation & Ent. (TNS)", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "DSA (RKK)", start: "15:30", end: "16:20", room: "A-104" }
-    ],
-    "Thursday": [
-        { name: "DSA Lab (RKK/SSD)", start: "09:40", end: "11:20", room: "A-010" },
-        { name: "Differential Equations (NFS)", start: "11:20", end: "12:10", room: "A-104" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "Intelligent Systems (SSD)", start: "13:00", end: "13:50", room: "A-104" },
-        { name: "Differential Equations (NFS)", start: "13:50", end: "14:40", room: "A-104" },
-        { name: "Innovation & Ent. (TNS)", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "Digital Electronics (AKD)", start: "15:30", end: "16:20", room: "A-104" }
-    ],
-    "Friday": [
-        { name: "Digital Electronics (AKD)", start: "09:40", end: "10:30", room: "A-104" },
-        { name: "Differential Equations (NFS)", start: "10:30", end: "11:20", room: "A-104" },
-        { name: "Foreign Language", start: "11:20", end: "12:10", room: "-" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "Constitution Of India (SHM)", start: "13:00", end: "13:50", room: "A-104" },
-        { name: "Digital Electronics (AKD)", start: "13:50", end: "14:40", room: "A-104" },
-        { name: "Innovation & Ent. (TNS)", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "DSA (RKK)", start: "15:30", end: "16:20", room: "A-104" }
-    ],
-    "Saturday": [
-        { name: "DSA (RKK)", start: "09:40", end: "10:30", room: "A-104" },
-        { name: "Digital Electronics and IOT Lab (CEC0201)", start: "10:30", end: "12:10", room: "A-217" },
-        { name: "LUNCH BREAK", start: "12:10", end: "13:00", room: "-" },
-        { name: "Constitution of India (SHM)", start: "13:00", end: "13:50", room: "A-104" },
-        { name: "Differential Equations (NFS)", start: "13:50", end: "14:40", room: "A-104" },
-        { name: "Intelligent Systems (SSD)", start: "14:40", end: "15:30", room: "A-104" },
-        { name: "Foreign Language", start: "15:30", end: "16:20", room: "-" }
-    ]
+// ── Teacher & Subject lookup ─────────────────────────────────────────────────
+const TEACHERS = {
+  AKD: "Dr. Amit Kumar Dash",
+  NFS: "Dr. Nafees Siddiqui",
+  RKK: "Mr. Rakesh Kumar",
+  SSD: "Ms. Shristi Dixit",
+  TNS: "Ms. Taanya Seth",
+  GRJ: "Ms. Garima Joshi",
+  HNK: "Ms. Garima Joshi",
+  SHM: "Mr. Shawan Mondal",
+  STY: "",
 };
 
-function refreshTracker() {
-    const now = new Date();
-    const day = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
-    const today = schedule[day] || [];
-    const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+const SUBJECTS = {
+  CEC0201:  "Digital Electronics & IoT System",
+  CAS0203A: "Differential Equations & Linear Transformations",
+  CCSE0201: "Data Structure & Algorithm I",
+  CCSE0202: "Intelligent Interaction Systems",
+  CMB0201:  "Innovation & Entrepreneurship",
+  CNC0202:  "Constitution of India, Law & Engineering",
+  CASL0251: "DS&A Lab",
+};
 
-    let current = today.find(s => time >= s.start && time < s.end);
-    let nextOnes = today.filter(s => s.start > time);
-
-    // Update Main Card
-    document.getElementById('current-class').innerText = current ? current.name : "Class Dismissed";
-    document.getElementById('room').innerText = current ? current.room : "--";
-    
-    if (current) {
-        const [h, m] = current.end.split(':');
-        const end = new Date(); end.setHours(h, m, 0);
-        const diff = Math.floor((end - now) / 1000);
-        const mm = Math.floor(diff / 60);
-        const ss = diff % 60;
-        document.getElementById('timer').innerText = `${mm}:${ss.toString().padStart(2, '0')}`;
-    } else {
-        document.getElementById('timer').innerText = "--:--";
-    }
-
-    // Update List
-    document.getElementById('upcoming-list').innerHTML = nextOnes.map(s => `
-        <div class="list-item">
-            <div class="list-info">
-                <h4>${s.name}</h4>
-                <p>Room ${s.room}</p>
-            </div>
-            <div class="list-time">${s.start}</div>
-        </div>
-    `).join('') || `<div style="text-align:center; padding: 20px; opacity:0.5;">No more lectures today</div>`;
+function teacherName(code) {
+  return TEACHERS[code] || code;
+}
+function subjectName(code) {
+  return SUBJECTS[code] || code;
 }
 
-setInterval(refreshTracker, 1000);
-refreshTracker();
+// ── Timetable ────────────────────────────────────────────────────────────────
+// Each entry: { s, e, teacher, code, type: 'L'|'P', room? }
+const TT = {
+  Monday: [
+    { s:"09:40", e:"10:30", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"10:30", e:"11:20", type:"L", teacher:"RKK", code:"CCSE0201" },
+    { s:"11:20", e:"12:10", type:"L", teacher:"AKD", code:"CEC0201" },
+    { s:"12:10", e:"13:00", sub:"Lunch Break", lunch:true },
+    { s:"13:00", e:"13:50", type:"P", teacher:"RKK/STY", code:"CEC0201", room:"A-010" },
+    { s:"13:50", e:"14:40", type:"L", teacher:"NFS", code:"CAS0203A", room:"A-010" },
+    { s:"14:40", e:"15:30", type:"L", teacher:"NFS", code:"CAS0203A", room:"J-410" },
+    { s:"15:30", e:"16:30", type:"L", teacher:"NFS", code:"CAS0203A", room:"F-104 / G-106" },
+  ],
+  Tuesday: [
+    { s:"09:40", e:"10:30", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"10:30", e:"11:20", type:"L", teacher:"RKK", code:"CCSE0201" },
+    { s:"11:20", e:"12:10", type:"L", teacher:"AKD", code:"CEC0201" },
+    { s:"12:10", e:"13:00", sub:"Lunch Break", lunch:true },
+    { s:"13:00", e:"13:50", type:"P", teacher:"GRJ/HNK", code:"CASL0251", room:"G1(211)/G2(104)" },
+    { s:"13:50", e:"14:40", type:"L", teacher:"TNS", code:"CMB0201" },
+    { s:"14:40", e:"15:30", type:"L", teacher:"SSD", code:"CCSE0202" },
+  ],
+  Wednesday: [
+    { s:"09:40", e:"10:30", type:"L", teacher:"AKD", code:"CEC0201" },
+    { s:"10:30", e:"11:20", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"11:20", e:"12:10", type:"L", teacher:"SSD", code:"CCSE0202" },
+    { s:"12:10", e:"13:00", sub:"Lunch Break", lunch:true },
+    { s:"13:00", e:"13:50", type:"P", teacher:"GRJ/HNK", code:"CASL0251", room:"G1(211)/G2(104)" },
+    { s:"13:50", e:"14:40", type:"L", teacher:"TNS", code:"CMB0201" },
+    { s:"14:40", e:"15:30", type:"L", teacher:"RKK", code:"CCSE0201" },
+  ],
+  Thursday: [
+    { s:"09:40", e:"10:30", type:"P", teacher:"RKK/SSD", code:"CCSE0201" },
+    { s:"10:30", e:"11:20", type:"L", teacher:"NFS", code:"CAS0203A", room:"A-010 / CCSE0251" },
+    { s:"11:20", e:"12:10", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"12:10", e:"13:00", sub:"Lunch Break", lunch:true },
+    { s:"13:00", e:"13:50", type:"L", teacher:"SSD", code:"CCSE0202" },
+    { s:"13:50", e:"14:40", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"14:40", e:"15:30", type:"L", teacher:"TNS", code:"CMB0201" },
+    { s:"15:30", e:"16:30", type:"L", teacher:"AKD", code:"CEC0201" },
+  ],
+  Friday: [
+    { s:"09:40", e:"10:30", type:"L", teacher:"AKD", code:"CEC0201" },
+    { s:"10:30", e:"11:20", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"11:20", e:"12:10", type:"L", teacher:"NFS", code:"CAS0203A", room:"J-410 / F-104 / G-106" },
+    { s:"12:10", e:"13:00", sub:"Lunch Break", lunch:true },
+    { s:"13:00", e:"13:50", type:"L", teacher:"SHM", code:"CNC0202" },
+    { s:"13:50", e:"14:40", type:"L", teacher:"AKD", code:"CEC0201" },
+    { s:"14:40", e:"15:30", type:"L", teacher:"TNS", code:"CMB0201" },
+    { s:"15:30", e:"16:30", type:"L", teacher:"RKK", code:"CCSE0201" },
+  ],
+  Saturday: [
+    { s:"09:40", e:"10:30", type:"L", teacher:"RKK", code:"CCSE0201" },
+    { s:"10:30", e:"11:20", type:"L", teacher:"AKD", code:"AKD/AKK" },
+    { s:"11:20", e:"12:10", type:"L", teacher:"AKD", code:"CEC0201", room:"A-217" },
+    { s:"12:10", e:"13:00", sub:"Lunch Break", lunch:true },
+    { s:"13:00", e:"13:50", type:"L", teacher:"SHM", code:"CNC0202" },
+    { s:"13:50", e:"14:40", type:"L", teacher:"NFS", code:"CAS0203A" },
+    { s:"14:40", e:"15:30", type:"L", teacher:"SSD", code:"CCSE0202", room:"J-410 / F-104 / G-106" },
+  ],
+  Sunday: []
+};
+
+const DAYS   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function toMin(t) { const [h,m]=t.split(":").map(Number); return h*60+m; }
+function fmt12(t) {
+  const [h,m]=t.split(":").map(Number);
+  return `${h%12||12}:${String(m).padStart(2,"0")} ${h>=12?"pm":"am"}`;
+}
+function durStr(s,e) {
+  const d=toMin(e)-toMin(s);
+  if(d<60) return `${d} min`;
+  const h=Math.floor(d/60),m=d%60;
+  return m?`${h}h ${m}m`:`${h}h`;
+}
+function cStr(mins,pre) {
+  if(mins<=0) return "";
+  const h=Math.floor(mins/60),m=mins%60;
+  const s=h?(m?`${h}h ${m}m`:`${h}h`):`${m}m`;
+  return pre?`${pre} ${s}`:s;
+}
+function dateStr(d) {
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+function nextClassDay(fromIdx) {
+  for(let i=1;i<=7;i++){
+    const idx=(fromIdx+i)%7;
+    if(TT[DAYS[idx]]&&TT[DAYS[idx]].length) return {idx,offset:i};
+  }
+  return {idx:(fromIdx+1)%7,offset:1};
+}
+
+function makeCard(lec, nowMins, isToday) {
+  const s=toMin(lec.s), e=toMin(lec.e);
+  let state="upcoming";
+  if(isToday){ if(nowMins>=e) state="past"; else if(nowMins>=s) state="current"; }
+
+  const card=document.createElement("div");
+  const isLab = lec.type==="P";
+  card.className=`lec-card state-${state}${lec.lunch?" is-lunch":""}${isLab?" is-lab":""}`;
+
+  let pillHtml="", countHtml="", progressHtml="";
+
+  if(lec.lunch){
+    if(isToday){
+      if(state==="past") pillHtml=`<span class="pill pill-done">Done</span>`;
+      else if(state==="current"){
+        pillHtml=`<span class="pill pill-lunch"><span class="live-dot"></span>Break</span>`;
+        countHtml=`<div class="countdown">${cStr(e-nowMins)} left</div>`;
+      } else { pillHtml=`<span class="pill pill-soon">${cStr(s-nowMins,"in")}</span>`; }
+    } else { pillHtml=`<span class="pill pill-lunch">${fmt12(lec.s)}</span>`; }
+  } else {
+    if(state==="current"){
+      const pct=Math.min(100,Math.round(((nowMins-s)/(e-s))*100));
+      pillHtml=`<span class="pill pill-live"><span class="live-dot"></span>Live</span>`;
+      countHtml=`<div class="countdown">${cStr(e-nowMins)} left</div>`;
+      progressHtml=`<div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+    } else if(state==="past"){
+      pillHtml=`<span class="pill pill-done">Done</span>`;
+    } else {
+      if(isLab) pillHtml=isToday
+        ?`<span class="pill pill-lab">${cStr(s-nowMins,"in")}</span>`
+        :`<span class="pill pill-lab">Lab</span>`;
+      else pillHtml=isToday
+        ?`<span class="pill pill-soon">${cStr(s-nowMins,"in")}</span>`
+        :`<span class="pill pill-soon">${fmt12(lec.s)}</span>`;
+    }
+  }
+
+  const subjDisplay = lec.lunch ? lec.sub : subjectName(lec.code);
+  const teacherDisplay = lec.lunch ? "" : teacherName(lec.teacher);
+  const typeTag = (!lec.lunch && lec.code) ? `<span class="code-tag">${lec.type==="P"?"Practical":"Lecture"} · ${lec.code}</span>` : "";
+  const roomTag = lec.room ? `<div class="room-tag">Room: ${lec.room}</div>` : "";
+
+  card.innerHTML=`
+    <div class="time-col">
+      <div class="t-start">${fmt12(lec.s)}</div>
+      <div class="t-sep">↓</div>
+      <div class="t-end">${fmt12(lec.e)}</div>
+    </div>
+    <div class="info-col">
+      <div class="subj">${subjDisplay}</div>
+      ${teacherDisplay?`<div class="teacher-name">${teacherDisplay}</div>`:""}
+      ${typeTag}
+      ${roomTag}
+      <div class="dur">${durStr(lec.s,lec.e)}</div>
+      ${progressHtml}
+    </div>
+    <div class="status-col">${pillHtml}${countHtml}</div>`;
+  return card;
+}
+
+function renderDay(listEl, headEl, dayName, dateObj, isToday, badgeClass, badgeLabel) {
+  const lecs=TT[dayName]||[];
+  const now=new Date();
+  const nowMins=isToday?(now.getHours()*60+now.getMinutes()):-1;
+
+  headEl.innerHTML=`
+    <div class="section-head">
+      <span class="section-badge ${badgeClass}">${badgeLabel}</span>
+      <span class="section-day">${dayName}</span>
+      <span class="section-date">${dateStr(dateObj)}</span>
+    </div>`;
+
+  listEl.innerHTML="";
+  if(!lecs.length){
+    listEl.innerHTML=`<div class="no-classes">No classes scheduled — enjoy your day!</div>`;
+    return;
+  }
+  lecs.forEach((lec,i)=>{
+    const card=makeCard(lec,nowMins,isToday);
+    card.style.animationDelay=`${i*0.04}s`;
+    listEl.appendChild(card);
+  });
+}
+
+function updateClock() {
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  const hh=h%12||12,ap=h>=12?"pm":"am";
+  document.getElementById("clock-time").textContent=
+    `${String(hh).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  document.getElementById("clock-ampm").textContent=ap;
+
+  const dayName=DAYS[now.getDay()];
+  const lecs=TT[dayName]||[];
+  const nowMins=h*60+m;
+  let status="No classes today — enjoy the day!";
+  const lunch=lecs.find(l=>l.lunch&&toMin(l.s)<=nowMins&&nowMins<toMin(l.e));
+  const active=lecs.find(l=>!l.lunch&&toMin(l.s)<=nowMins&&nowMins<toMin(l.e));
+  const next=lecs.find(l=>!l.lunch&&toMin(l.s)>nowMins);
+  if(lunch) status=`Lunch break · ${cStr(toMin(lunch.e)-nowMins)} remaining`;
+  else if(active) status=`${subjectName(active.code)} · ${cStr(toMin(active.e)-nowMins)} left`;
+  else if(next) status=`Next: ${subjectName(next.code)} ${cStr(toMin(next.s)-nowMins,"in")}`;
+  else if(lecs.length) status="All classes for today are done!";
+  document.getElementById("clock-status").textContent=status;
+}
+
+function renderAll() {
+  const now=new Date();
+  const todayIdx=now.getDay();
+  renderDay(
+    document.getElementById("today-list"),
+    document.getElementById("today-head"),
+    DAYS[todayIdx],now,true,"badge-today","Today"
+  );
+  const {idx:nextIdx,offset}=nextClassDay(todayIdx);
+  const nextDate=new Date(now);
+  nextDate.setDate(nextDate.getDate()+offset);
+  document.getElementById("divider-label").textContent=
+    offset===1?"Tomorrow":`Next class day (${DAYS[nextIdx]})`;
+  renderDay(
+    document.getElementById("next-list"),
+    document.getElementById("next-head"),
+    DAYS[nextIdx],nextDate,false,"badge-next",offset===1?"Tomorrow":"Upcoming"
+  );
+}
+
+// ── Dark mode toggle ──────────────────────────────────────────────────────────
+const html=document.documentElement;
+const savedTheme=localStorage.getItem("niet-theme")||"light";
+html.setAttribute("data-theme",savedTheme);
+updateToggleUI(savedTheme);
+
+document.getElementById("theme-toggle").addEventListener("click",()=>{
+  const current=html.getAttribute("data-theme");
+  const next=current==="light"?"dark":"light";
+  html.setAttribute("data-theme",next);
+  localStorage.setItem("niet-theme",next);
+  updateToggleUI(next);
+});
+
+function updateToggleUI(theme) {
+  document.getElementById("toggle-icon").textContent=theme==="dark"?"☀️":"🌙";
+  document.getElementById("toggle-label").textContent=theme==="dark"?"Light mode":"Dark mode";
+}
+
+renderAll();
+updateClock();
+setInterval(updateClock,1000);
+setInterval(renderAll,60000);
 </script>
 </body>
 </html>
